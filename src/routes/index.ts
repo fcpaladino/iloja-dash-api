@@ -1,0 +1,46 @@
+import {Router} from "express";
+import auth from "./auth";
+import company from "./company";
+import role from "./role";
+import user from "./user";
+import people from "./people";
+import group from "./group";
+import subgroup from "./subgroup";
+import brand from "./brand";
+import category from "./category";
+import product from "./product";
+import coupon from "./coupon";
+import tag from "./tag";
+import deliveryType from "./delivery-type";
+import filter from "./filter";
+import paymentMethod from "./payment-method";
+import order from "./order";
+import shippingCep from "./shipping-cep";
+import shippingRule from "./shipping-rule";
+import shippingNeighborhod from "./shipping-neighborhod";
+import apiRoutes from "../API/routes";
+
+const routes = Router();
+
+routes.use(apiRoutes);
+routes.use(auth);
+routes.use(company);
+routes.use(role);
+routes.use(user);
+routes.use(people);
+routes.use(group);
+routes.use(subgroup);
+routes.use(brand);
+routes.use(category);
+routes.use(product);
+routes.use(coupon);
+routes.use(tag);
+routes.use(deliveryType);
+routes.use(filter);
+routes.use(paymentMethod);
+routes.use(order);
+routes.use(shippingCep);
+routes.use(shippingRule);
+routes.use(shippingNeighborhod);
+
+export default routes;

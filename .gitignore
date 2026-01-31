@@ -1,0 +1,15 @@
+node_modules
+public/*
+dist
+!public/.gitkeep
+.env
+.env.test
+.env.prd
+.env.hmg
+package-lock.json
+yarn.lock
+yarn-error.log
+/src/config/sentry.js
+.idea/*
+midias/*
+!midias/.gitkeep
