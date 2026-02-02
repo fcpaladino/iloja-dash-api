@@ -10,6 +10,8 @@ import {whereSearch} from "../../database/sequelizeExtension";
 import {buildFilters} from "../../helpers/buildFilters";
 import {gerarHashEmail} from "../../utils/helpers";
 import {remove, rename} from "../../utils/file";
+import {logDevJson} from "../../helpers/logDev";
+import ProductImage from "../../models/ProductImage";
 
 const validateForm = async (data: IProductItem, id: number | null = null) => {
   const schema = yup.object().shape({
@@ -160,6 +162,10 @@ class ProductController {
       const userReq = req.user as IReqUser;
       const {productId} = req.params;
       const file = req.file as MulterFile;
+      const data = req.body;
+
+      logDevJson(file)
+      logDevJson(data)
 
       const product = await Product.findByPk(productId, {attributes: ['id', 'image']});
 
@@ -168,8 +174,23 @@ class ProductController {
 
       await rename({caminhoAtual: file.path, novoNome: filename });
 
-      product.image = `midias/company${userReq.companyId}/product/${filename}`;
+      const url = `midias/company${userReq.companyId}/product/${filename}`;
+
+      product.image = url;
       await product.save();
+
+      await ProductImage.create({
+        companyId: userReq.companyId,
+        productId: productId,
+        name: data.originalName,
+        size: file.size,
+        url,
+        mimetype: file.mimetype,
+        width: data.width,
+        height: data.height,
+        isDefault: true,
+        active: true,
+      });
 
       return res.end();
     } catch (e) {
@@ -188,6 +209,8 @@ class ProductController {
 
       product.image = null;
       await product.save();
+
+      await ProductImage.destroy({where: {productId: productId, isDefault: true}, force: true});
 
       return res.end();
     } catch (e) {
