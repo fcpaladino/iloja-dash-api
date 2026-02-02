@@ -78,12 +78,6 @@ class PeopleAddress extends Model<PeopleAddress> {
   longitude: string;
 
   @AllowNull
-  @Column({
-    type: DataType.GEOGRAPHY('POINT', 4326),
-  })
-  geography: Geolocation;
-
-  @AllowNull
   @Column
   ibgeCode: string;
 
