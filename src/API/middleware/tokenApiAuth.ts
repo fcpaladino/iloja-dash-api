@@ -21,6 +21,7 @@ const tokenApiAuth = async (req: Request, res: Response, next: NextFunction): Pr
       throw new Error("Host inválido (precisa ser xxxxx.iloja.me)");
     }
 
+    console.log('\n subdomain: ',subdomain,'\n');
     const company = await Company.findOne({
       where: { subdomain },
       attributes: ["id", "subdomain"],
