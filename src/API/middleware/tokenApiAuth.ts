@@ -10,9 +10,10 @@ function getSubdomain(req: Request) {
 
   // if (host.endsWith(".iloja.me")) return host.replace(".iloja.me", "").split(".")[0];
 
-  const xt = String(req.headers["X-Tenant"] || "").toLowerCase();
+  const xt = String(req.headers["x-tenant"] || "").toLowerCase();
 
   console.log('\n xt: ',xt,'\n');
+  console.log('\n headers: ',JSON.stringify(req.headers,null,2),'\n');
 
   return xt || null;
 }
