@@ -6,14 +6,7 @@ function getSubdomain(req: Request) {
   const host = String(req.headers["x-forwarded-host"] || req.headers.host || "")
     .split(",")[0].trim().split(":")[0].toLowerCase();
 
-  console.log('\n host: ',host,'\n');
-
-  // if (host.endsWith(".iloja.me")) return host.replace(".iloja.me", "").split(".")[0];
-
   const xt = String(req.headers["x-tenant"] || "").toLowerCase();
-
-  console.log('\n xt: ',xt,'\n');
-  console.log('\n headers: ',JSON.stringify(req.headers,null,2),'\n');
 
   return xt || null;
 }
@@ -27,7 +20,6 @@ const tokenApiAuth = async (req: Request, res: Response, next: NextFunction): Pr
       throw new Error("Host inválido (precisa ser xxxxx.iloja.me)");
     }
 
-    console.log('\n subdomain: ',subdomain,'\n');
     const company = await Company.findOne({
       where: { subdomain },
       attributes: ["id", "subdomain"],
