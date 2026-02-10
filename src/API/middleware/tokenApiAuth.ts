@@ -6,9 +6,14 @@ function getSubdomain(req: Request) {
   const host = String(req.headers["x-forwarded-host"] || req.headers.host || "")
     .split(",")[0].trim().split(":")[0].toLowerCase();
 
+  console.log('\n host: ',host,'\n');
+
   if (host.endsWith(".iloja.me")) return host.replace(".iloja.me", "").split(".")[0];
 
   const xt = String(req.headers["x-tenant"] || "").toLowerCase();
+
+  console.log('\n xt: ',xt,'\n');
+
   return xt || null;
 }
 
