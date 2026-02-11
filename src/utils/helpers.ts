@@ -78,3 +78,8 @@ export function createUsernameByEmail(email: string) {
   if(!email) return "";
   return email.toLowerCase().trim().split('@')[0];
 }
+
+export function gerarCodigoUnico() {
+  // Gera um número aleatório entre 1000 e 9999
+  return Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+}

@@ -10,6 +10,7 @@ import Company from "../../models/Company";
 import PasswordRecovery from "../../models/PasswordRecovery";
 import moment from "moment";
 import {addHours} from "date-fns";
+import {gerarCodigoUnico} from "../../utils/helpers";
 
 class PasswordSendController {
   constructor() {
@@ -49,6 +50,8 @@ class PasswordSendController {
     const token = await hash(`${user.id}:${user.email}`, 8);
     const validIn = addHours(moment().toDate(), 3);
 
+    const code = String(gerarCodigoUnico());
+
     await PasswordRecovery.destroy({
       where: {email}
     });
@@ -56,16 +59,20 @@ class PasswordSendController {
     await PasswordRecovery.create({
       email,
       token,
+      code,
       validIn
     });
 
     const link = `${app.frontUrl}/auth/password-reset/${`${base64}`}?hash=${token}`;
 
     await sendEmail({
-      from: 'conta@wachat.app.br',
+      from: 'naoresponder@iloja.me',
       to: user.email,
       subject: 'Recuperação de senha',
-      html: recuperarSenha().replace(/{nomeCliente}/g, user.name).replace(/{link}/g, link),
+      html: recuperarSenha()
+        .replace(/{nomeCliente}/g, user.name)
+        .replace(/{code}/g, code)
+        .replace(/{link}/g, link),
     });
 
     return res.status(200).json({ message: 'Foi enviado um link no email, para recuperação da conta.', success: true });

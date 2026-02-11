@@ -25,10 +25,13 @@ class PasswordResetController {
 
       const [userId, userEmail] = decodedText.split(':');
 
+      // console.log('decodedText', decodedText);
+      // console.log('token', token);
+
       const dbpass = await PasswordRecovery.findOne({
         where: {
           email: userEmail,
-          token
+          token: hash
         }
       });
 

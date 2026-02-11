@@ -10,6 +10,8 @@ const recuperarSenha = () => {
 
     <p>Recebemos uma solicitação para redefinir a senha da sua conta na plataforma ZapShow. Se você não fez essa solicitação, por favor, ignore este e-mail.</p>
 
+    <p>CODIGO: <strong>{code}</strong></p>
+
     <p>Caso você realmente tenha solicitado a redefinição da senha, clique no link abaixo para criar uma nova senha:</p>
 
     <p><a href="{link}">Clique aqui para redefinir sua senha</a></p>
