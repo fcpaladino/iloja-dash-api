@@ -21,6 +21,14 @@ type ICompanyItem = {
   siteSubTitle?: string;
   colorPrimary?: string;
   colorSecondary?: string;
+  themeMode?: 'light'|'dark';
+  darkBackground?: string;
+  backgroundBannerStyle?: 'none'|'cart'|'nature'|'pets'|'fashion'|'tech'|'health'|string;
+  headerBackgroundColor?: string;
+  backgroundIconPattern?: 'none'|'mercado'|'sacolao'|'petshop'|'moda'|'eletronicos'|'farmacia'|'moveis'|'construcao'|'automotivo'|'beleza'|'esportes'|'papelaria'|'bebidas'|'joias'|'jardinagem'|string;
+  backgroundIconColor?: string;
+  backgroundIconOpacity?: number;
+  productCardType?: string;
   chavePix?: string;
   isBtnWhatsapp?: boolean;
   isOrder?: boolean;

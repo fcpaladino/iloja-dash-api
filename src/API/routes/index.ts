@@ -6,6 +6,8 @@ import paymentMethod from "./payment-method";
 import order from "./order";
 import company from "./company";
 import contact from "./contact";
+import analytics from "./analytics";
+import shippingNeighborhood from "./shipping-neighborhood";
 
 
 const routes = Router();
@@ -17,5 +19,7 @@ routes.use(paymentMethod);
 routes.use(order);
 routes.use(company);
 routes.use(contact);
+routes.use(analytics);
+routes.use(shippingNeighborhood);
 
 export default routes;

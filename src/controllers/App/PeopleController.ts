@@ -23,6 +23,32 @@ class PeopleController {
     this.store = this.store.bind(this);
     this.update = this.update.bind(this);
     this.destroy = this.destroy.bind(this);
+    this.lookupByPhone = this.lookupByPhone.bind(this);
+  }
+
+  @TryCatch()
+  async lookupByPhone(req: Request, res: Response): Promise<Response> {
+    try {
+      const user = req.user as IReqUser;
+      let digits = String(req.params.phone || '').replace(/\D/g, '');
+      if (digits.startsWith('55')) digits = digits.slice(2);
+      const normalized = digits.length >= 10 ? `${digits.slice(0, 2)}${digits.slice(-8)}` : digits;
+      const suffix = digits.slice(-8);
+      const item = await People.findOne({
+        where: {
+          companyId: user.companyId,
+          [Op.or]: [
+            { waId: normalized },
+            { phoneNumber: { [Op.like]: `%${suffix}` } },
+          ],
+        },
+        attributes: ['id', 'legalName', 'tradeName', 'phoneNumber', 'documentNumber', 'email'],
+      });
+      if (!item) return res.status(404).json({ message: 'Cliente não encontrado.' });
+      return res.json(responseSuccess({ ...item.toJSON(), name: item.tradeName || item.legalName }));
+    } catch (error) {
+      return HandlerError(error, res);
+    }
   }
 
   @TryCatch()

@@ -76,6 +76,8 @@ class Product extends BaseModel<Product> {
 
       let value = this.getDataValue("image");
 
+      if (/^https?:\/\//i.test(value)) return value;
+
       if(!value.includes('amazonaws')){
         return `${process.env.BACKEND_URL}/${this.getDataValue("image")}`;
       }

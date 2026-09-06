@@ -17,9 +17,12 @@ class OrderController {
     try{
       const {companyId} = req.params as unknown as IReqParams;
       const data = req.body;
+      const peopleData = data.people || data.client || {};
+      const whatsapp = peopleData.whatsapp || peopleData.number || "";
 
-      const v = String(data.client.number).replace(/\D/g, "");
-      const waId = `${v.slice(0, 2)}${v.slice(-8)}`
+      let v = String(whatsapp).replace(/\D/g, "");
+      if (v.startsWith("55") && v.length > 11) v = v.slice(2);
+      const waId = v.length >= 10 ? `${v.slice(0, 2)}${v.slice(-8)}` : v;
 
       const point = Math.floor(data.total);
 
@@ -31,7 +34,8 @@ class OrderController {
         defaults:{
           companyId: companyId,
           waId: waId,
-          legalName: data.client.name,
+          legalName: peopleData.name,
+          phoneNumber: v,
           point
         }
       });
@@ -45,14 +49,16 @@ class OrderController {
       const order = await Order.create({
         companyId,
         peopleId: people.id,
-        paymentMethodId: data.pagamento.id??null,
-        couponId: data.cupom.id??null,
-        deliveryTypeId: data.recebimento.id??null,
+        paymentMethodId: data.paymentMethodId ?? data.pagamento?.id ?? null,
+        couponId: data.couponId ?? data.cupom?.id ?? null,
+        deliveryTypeId: data.deliveryTypeId ?? data.recebimento?.id ?? null,
         statusId: 1,
         subtotal: data.subtotal,
         total: data.total,
-        note: data.obs,
-        changeValue: data.pagamento.changeValue??null,
+        note: data.note ?? data.obs ?? null,
+        changeValue: data.changeValue ?? data.pagamento?.changeValue ?? null,
+        shippingValue: data.shippingValue ?? 0,
+        discountValue: data.discountValue ?? 0,
         pointGenerated: Math.floor(data.total),
       });
 
@@ -60,13 +66,13 @@ class OrderController {
         for(let item of data.items){
           await OrderItem.create({
             orderId: order.id,
-            productId: item.id,
-            productRef: item.ref??item.id,
-            productName: item.name,
-            quantity: item.qty,
-            unitPrice: item.price,
-            totalPrice: (item.qty * parseFloat(item.price)),
-            note: item?.obs??null
+            productId: item.productId ?? item.id,
+            productRef: item.productRef ?? item.ref ?? item.productId ?? item.id,
+            productName: item.productName ?? item.name,
+            quantity: item.quantity ?? item.qty,
+            unitPrice: item.unitPrice ?? item.price,
+            totalPrice: item.totalPrice ?? ((item.quantity ?? item.qty) * parseFloat(item.unitPrice ?? item.price)),
+            note: item.note ?? item.obs ?? null
           });
         }
       }
@@ -79,7 +85,13 @@ class OrderController {
 
 
 
-      return responseSuccess(res, []);
+      return responseSuccess(res, [{
+        ...data,
+        id: order.id,
+        createdAt: order.createdAt,
+        statusKey: "received",
+        statusLabel: "Pedido recebido",
+      }]);
     } catch (e){
       console.error(e);
       return HandlerError(res, e, 'Api.Order.store');

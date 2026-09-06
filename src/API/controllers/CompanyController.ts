@@ -20,6 +20,9 @@ class CompanyController {
       const item = {
         colorPrimary:company.colorPrimary,
         colorSecondary:company.colorSecondary,
+        themeMode: company.themeMode || 'dark',
+        darkBackground: company.darkBackground || '#202124',
+        productCardType:company.productCardType || "right_square",
         siteTitle:company.siteTitle,
         siteSubTitle:company.siteSubTitle,
         contactEmail:company.contactEmail,
@@ -29,6 +32,11 @@ class CompanyController {
         schedule:company.schedule,
         isOrder:company.isOrder,
         isFrete:company.isFrete,
+        backgroundBannerStyle: company.backgroundBannerStyle || 'cart',
+        headerBackgroundColor: company.headerBackgroundColor || '#242424',
+        backgroundIconPattern: company.backgroundIconPattern || 'mercado',
+        backgroundIconColor: company.backgroundIconColor || company.colorPrimary || null,
+        backgroundIconOpacity: company.backgroundIconOpacity ?? 0.6,
       };
 
       return responseSuccess(res, [item]);

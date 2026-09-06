@@ -59,7 +59,7 @@ class CompanyController {
       const user = req.user as IReqUser;
       const {id} = req.params;
 
-      const item: ICompanyItem = await Company.findByPk(id);
+      const item = await Company.findByPk(id) as unknown as ICompanyItem;
 
       return res.json({data: item});
 

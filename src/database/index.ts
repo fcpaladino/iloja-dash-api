@@ -35,6 +35,7 @@ import ShippingRule from "../models/ShippingRule";
 import ShippingNeighborhod from "../models/ShippingNeighborhod";
 import ShippingCep from "../models/ShippingCep";
 import Tag from "../models/Tag";
+import AnalyticsEvent from "../models/AnalyticsEvent";
 
 
 const dbConfig = require("../config/database");
@@ -76,7 +77,8 @@ sequelize.addModels([
   ShippingRule,
   ShippingNeighborhod,
   ShippingCep,
-  Tag
+  Tag,
+  AnalyticsEvent
 ]);
 
 AddOverrideQuery();

@@ -68,6 +68,8 @@ class Company extends BaseModel<Company> {
 
       let value = this.getDataValue("logotipo");
 
+      if (/^https?:\/\//i.test(value)) return value;
+
       if(!value.includes('amazonaws')){
         return `${process.env.BACKEND_URL}/${this.getDataValue("logotipo")}`;
       }
@@ -111,6 +113,38 @@ class Company extends BaseModel<Company> {
   @AllowNull
   @Column
   colorSecondary: string;
+
+  @AllowNull
+  @Column
+  themeMode: string;
+
+  @AllowNull
+  @Column
+  darkBackground: string;
+
+  @AllowNull
+  @Column
+  backgroundBannerStyle: string;
+
+  @AllowNull(false)
+  @Column({defaultValue: '#242424'})
+  headerBackgroundColor: string;
+
+  @AllowNull(false)
+  @Column({defaultValue: 'mercado'})
+  backgroundIconPattern: string;
+
+  @AllowNull
+  @Column
+  backgroundIconColor: string;
+
+  @AllowNull(false)
+  @Column({defaultValue: 0.6})
+  backgroundIconOpacity: number;
+
+  @AllowNull(false)
+  @Column({defaultValue: "right_square"})
+  productCardType: string;
 
   @AllowNull
   @Column

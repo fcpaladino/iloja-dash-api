@@ -46,7 +46,7 @@ class CategoryController {
         page,
         where: where,
         order: order,
-        attributes: ['id', 'name', 'active'],
+        attributes: ['id', 'name', 'active', 'productCardType'],
       });
 
       return res.json({data: items.items, meta: items.meta});
@@ -62,8 +62,8 @@ class CategoryController {
       const user = req.user as IReqUser;
 
       const items = await Category.findAll({
-        where: {companyId: user.companyId},
-        attributes: ['id', 'name']
+        where: {companyId: user.companyId, active: true},
+        attributes: ['id', 'name', 'active', 'productCardType']
       });
 
       return res.json({data: items});
@@ -80,7 +80,7 @@ class CategoryController {
       const {id} = req.params;
 
       const item = await Category.findByPk(id, {
-        attributes: ['id', 'name', 'active'],
+        attributes: ['id', 'name', 'active', 'productCardType'],
       });
 
       return res.json(responseSuccess({

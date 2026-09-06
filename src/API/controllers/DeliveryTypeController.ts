@@ -18,7 +18,7 @@ class DeliveryTypeController {
           companyId,
           active: true
         },
-        attributes: ['id', 'name', 'typeId', 'description', 'enableAddress'],
+        attributes: ['id', 'name', 'typeId', 'description', 'enableAddress', 'hasShipping', 'extraFee'],
         order: [["name", "ASC"]]
       })
 

@@ -34,6 +34,10 @@ class Category extends BaseModel<Category> {
   @Column
   active: boolean;
 
+  @AllowNull
+  @Column
+  productCardType: string;
+
   @CreatedAt
   createdAt: Date;
 

@@ -6,6 +6,7 @@ type ICategoryItem = {
   slug: string;
   order: number;
   active: boolean;
+  productCardType?: string | null;
 };
 
 type ICategoryListItem = {
@@ -14,4 +15,5 @@ type ICategoryListItem = {
   name: string;
   order: number;
   active: boolean;
+  productCardType?: string | null;
 };

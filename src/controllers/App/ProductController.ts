@@ -67,8 +67,8 @@ class ProductController {
       const user = req.user as IReqUser;
 
       const items = await Product.findAll({
-        where: {companyId: user.companyId},
-        attributes: ['id', 'name']
+        where: {companyId: user.companyId, active: true},
+        attributes: ['id', 'name', 'categoryId', 'price', 'pricePromotional', 'isPromotional', 'ref', 'sku', 'image']
       });
 
       return res.json({data: items});
