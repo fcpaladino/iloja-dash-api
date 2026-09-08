@@ -98,6 +98,26 @@ class People extends BaseModel<People> {
 
   @AllowNull
   @Column
+  phoneCode: string;
+
+  @AllowNull
+  @Column
+  phoneCodeExpiresAt: Date;
+
+  @AllowNull(false)
+  @Column({ defaultValue: true })
+  customerPortalAccess: boolean;
+
+  @AllowNull
+  @Column
+  phoneChangeNumber: string;
+
+  @AllowNull
+  @Column
+  phoneChangeWaId: string;
+
+  @AllowNull
+  @Column
   note: string;
 
   @AllowNull
@@ -107,6 +127,10 @@ class People extends BaseModel<People> {
   @AllowNull
   @Column
   point: number;
+
+  @AllowNull(false)
+  @Column({defaultValue: 0})
+  walletBalance: number;
 
   @CreatedAt
   createdAt: Date;

@@ -7,6 +7,7 @@ type ICategoryItem = {
   order: number;
   active: boolean;
   productCardType?: string | null;
+  visibleCount?: number | null;
 };
 
 type ICategoryListItem = {
@@ -16,4 +17,5 @@ type ICategoryListItem = {
   order: number;
   active: boolean;
   productCardType?: string | null;
+  visibleCount?: number | null;
 };

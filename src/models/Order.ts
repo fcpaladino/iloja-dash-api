@@ -22,6 +22,10 @@ class Order extends BaseModel<Order> {
   @Column
   companyId: number;
 
+  @AllowNull
+  @Column
+  userId: number;
+
   @AllowNull(false)
   @Column
   peopleId: number;
@@ -81,6 +85,14 @@ class Order extends BaseModel<Order> {
   @AllowNull
   @Column
   pointUsed: number;
+
+  @AllowNull(false)
+  @Column({defaultValue: 0})
+  walletUsed: number;
+
+  @AllowNull
+  @Column
+  visitorId: string;
 
   @CreatedAt
   createdAt: Date;

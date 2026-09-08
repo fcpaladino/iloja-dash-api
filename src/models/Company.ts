@@ -57,6 +57,10 @@ class Company extends BaseModel<Company> {
   @Column
   amount: number;
 
+  @AllowNull(false)
+  @Column({defaultValue: 0})
+  aiCredits: number;
+
   @AllowNull
   @Column
   subdomain: string;
@@ -145,6 +149,23 @@ class Company extends BaseModel<Company> {
   @AllowNull(false)
   @Column({defaultValue: "right_square"})
   productCardType: string;
+
+  @AllowNull(false) @Column({defaultValue: false}) pointsEnabled: boolean;
+  @AllowNull(false) @Column({defaultValue: 1}) pointValue: number;
+  @AllowNull(false) @Column({defaultValue: 0.01}) pointCashValue: number;
+  @AllowNull(false) @Column({defaultValue: false}) customerPortalEnabled: boolean;
+
+  @AllowNull(false)
+  @Column({defaultValue: 6})
+  categoryVisibleCount: number;
+
+  @AllowNull(false)
+  @Column({defaultValue: 3})
+  recommendedVisibleCount: number;
+
+  @AllowNull(false)
+  @Column({defaultValue: 3})
+  promotionVisibleCount: number;
 
   @AllowNull
   @Column

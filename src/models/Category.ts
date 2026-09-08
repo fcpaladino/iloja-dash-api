@@ -38,6 +38,10 @@ class Category extends BaseModel<Category> {
   @Column
   productCardType: string;
 
+  @AllowNull
+  @Column
+  visibleCount: number;
+
   @CreatedAt
   createdAt: Date;
 

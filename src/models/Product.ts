@@ -107,6 +107,10 @@ class Product extends BaseModel<Product> {
   @Column
   active: boolean;
 
+  @AllowNull(false)
+  @Column
+  includeInMetaFeed: boolean;
+
   @AllowNull
   @Column
   inventoryControl: boolean;
@@ -158,6 +162,12 @@ class Product extends BaseModel<Product> {
   @AllowNull
   @Column
   point: number;
+
+  @AllowNull(false) @Column({defaultValue: true}) allowPoints: boolean;
+  @AllowNull(false) @Column({defaultValue: 0}) pointsEarn: number;
+  @AllowNull(false) @Column({defaultValue: 0}) pointsCost: number;
+  @AllowNull(false) @Column({defaultValue: false}) pointsOnly: boolean;
+  @AllowNull(false) @Column({defaultValue: false}) pointsAndMoney: boolean;
 
   @AllowNull
   @Column

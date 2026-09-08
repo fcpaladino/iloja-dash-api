@@ -2,28 +2,20 @@ const sendEmail = async({...props}) => {
   const nodemailer = require('nodemailer');
 
   const transporter = nodemailer.createTransport({
-    service: "Gmail",
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: String(process.env.SMTP_SECURE || 'false') === 'true',
     auth: {
-      user: 'smtp.disparo@gmail.com',
-      pass: 'gvjblvfpqcckbdmj',
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
     },
-    debug: true,
-    // host: "45.164.94.15",
-    // port: 587,
-    // secure: false,
     logger: false,
-    // auth: {
-    //   user: 'cadastro@zapshow.com.br',
-    //   pass: 'mMl3%8f23',
-    // },
-    // tls: {rejectUnauthorized: false},
-
   });
 
   try {
     return await transporter.sendMail(props);
   } catch (error) {
-    //logdev(error);
+    console.error('Falha no envio de e-mail:', error);
     return null;
   }
 };

@@ -51,7 +51,7 @@ class ProductController {
         page,
         where: where,
         order: order,
-        attributes: ['id', 'name', 'active', 'price', 'pricePromotional', 'point', 'isNew', 'isPopular', 'isPromotional', 'ref', 'image'],
+        attributes: ['id', 'name', 'active', 'availability', 'includeInMetaFeed', 'price', 'pricePromotional', 'point', 'allowPoints', 'pointsEarn', 'pointsCost', 'pointsOnly', 'pointsAndMoney', 'isNew', 'isPopular', 'isPromotional', 'ref', 'image'],
       });
 
       return res.json({data: items.items, meta: items.meta});
@@ -68,7 +68,7 @@ class ProductController {
 
       const items = await Product.findAll({
         where: {companyId: user.companyId, active: true},
-        attributes: ['id', 'name', 'categoryId', 'price', 'pricePromotional', 'isPromotional', 'ref', 'sku', 'image']
+        attributes: ['id', 'name', 'categoryId', 'price', 'pricePromotional', 'point', 'allowPoints', 'pointsEarn', 'pointsCost', 'pointsOnly', 'pointsAndMoney', 'isPromotional', 'ref', 'sku', 'image']
       });
 
       return res.json({data: items});

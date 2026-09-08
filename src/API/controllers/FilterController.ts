@@ -24,7 +24,7 @@ class FilterController {
           companyId,
           active: true
         },
-        attributes: ['id', 'name', 'slug', 'productCardType'],
+        attributes: ['id', 'name', 'slug', 'productCardType', 'visibleCount'],
         order: [["name", "ASC"]]
       })
 

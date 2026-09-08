@@ -24,6 +24,7 @@ export const updateSchema = (id:string|null = null) => {
     phone: yup.string(),
     active: yup.boolean(),
     subdomain: yup.string(),
+    schedule: yup.mixed().nullable(),
 
     contactWhatsapp: yup.string().nullable(),
     contactEmail: yup.string().nullable(),
@@ -47,5 +48,12 @@ export const updateSchema = (id:string|null = null) => {
       'detailed',
       'grid',
     ]).nullable(),
+    categoryVisibleCount: yup.number().integer().min(1).max(50).nullable(),
+    pointsEnabled: yup.boolean().nullable(),
+    pointValue: yup.number().min(0).nullable(),
+    pointCashValue: yup.number().min(0).nullable(),
+    customerPortalEnabled: yup.boolean().nullable(),
+    recommendedVisibleCount: yup.number().integer().min(1).max(50).nullable(),
+    promotionVisibleCount: yup.number().integer().min(1).max(50).nullable(),
   })
 }

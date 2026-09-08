@@ -36,6 +36,17 @@ import ShippingNeighborhod from "../models/ShippingNeighborhod";
 import ShippingCep from "../models/ShippingCep";
 import Tag from "../models/Tag";
 import AnalyticsEvent from "../models/AnalyticsEvent";
+import CompanyAiCreditTransaction from "../models/CompanyAiCreditTransaction";
+import AiCreditOrder from "../models/AiCreditOrder";
+import ProductInteraction from "../models/ProductInteraction";
+import ProductPreference from "../models/ProductPreference";
+import Quote from "../models/Quote";
+import ProductStockMovement from "../models/ProductStockMovement";
+import ReceivableAccount from "../models/ReceivableAccount";
+import ReceivableInstallment from "../models/ReceivableInstallment";
+import CashMovement from "../models/CashMovement";
+import PointTransaction from "../models/PointTransaction";
+import WalletTransaction from "../models/WalletTransaction";
 
 
 const dbConfig = require("../config/database");
@@ -78,7 +89,18 @@ sequelize.addModels([
   ShippingNeighborhod,
   ShippingCep,
   Tag,
-  AnalyticsEvent
+  AnalyticsEvent,
+  CompanyAiCreditTransaction,
+  AiCreditOrder,
+  ProductInteraction,
+  ProductPreference
+  ,Quote
+  ,ProductStockMovement
+  ,ReceivableAccount
+  ,ReceivableInstallment
+  ,CashMovement
+  ,PointTransaction
+  ,WalletTransaction
 ]);
 
 AddOverrideQuery();

@@ -8,6 +8,7 @@ import PeopleAddress from "../../models/PeopleAddress";
 import {Op} from "sequelize";
 import {whereSearch} from "../../database/sequelizeExtension";
 import {buildFilters} from "../../helpers/buildFilters";
+import WalletTransaction from "../../models/WalletTransaction";
 
 const validateForm = async (data: IPeopleItem, id: number | null = null) => {
   const schema = yup.object().shape({
@@ -70,7 +71,7 @@ class PeopleController {
         page,
         where: where,
         order: order,
-        attributes: ['id', 'legalName'],
+        attributes: ['id', 'legalName', 'tradeName', 'personType', 'typeId', 'phoneNumber', 'customerPortalAccess', 'walletBalance', 'point'],
       });
 
       return res.json({data: items.items, meta: items.meta});
@@ -87,7 +88,7 @@ class PeopleController {
       const {id} = req.params;
 
       const item = await People.findByPk(id, {
-        attributes: ['id', 'typeId', 'documentNumber', 'legalName', 'nickname', 'phoneNumber', 'email', 'active', 'note'],
+        attributes: ['id', 'personType', 'typeId', 'documentNumber', 'legalName', 'tradeName', 'phoneNumber', 'email', 'active', 'customerPortalAccess', 'note', 'walletBalance', 'point'],
       });
 
       const address = await PeopleAddress.findOne({
@@ -143,7 +144,20 @@ class PeopleController {
       where:{peopleId: item.id},
     });
 
+    const previousWallet = Number(item.walletBalance || 0);
+    if (data.walletBalance !== undefined) data.walletBalance = Math.max(0, Number(data.walletBalance) || 0);
     await item.update(data);
+    if (data.walletBalance !== undefined && Number(data.walletBalance) !== previousWallet) {
+      await WalletTransaction.create({
+        companyId: user.companyId,
+        peopleId: item.id,
+        type: Number(data.walletBalance) > previousWallet ? 'CREDIT' : 'ADJUSTMENT',
+        amount: Number((Number(data.walletBalance) - previousWallet).toFixed(2)),
+        balanceBefore: previousWallet,
+        balanceAfter: Number(data.walletBalance),
+        metadata: {source: 'people_update'},
+      });
+    }
     await address.update(data);
 
     return res.json(responseSuccess({item}));

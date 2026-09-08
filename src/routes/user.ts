@@ -4,9 +4,12 @@ import Controller from "../controllers/Admin/UserController";
 import isAuth from "../middleware/isAuth";
 
 import uploadConfig from "../config/upload";
+import PortalController from "../controllers/PortalController";
 const upload = multer(uploadConfig);
 
 const route = express.Router();
+
+route.get("/user/portal", isAuth, PortalController.index);
 
 route.get("/admin/user", isAuth, Controller.index);
 route.get("/admin/user/:id", isAuth, Controller.show);

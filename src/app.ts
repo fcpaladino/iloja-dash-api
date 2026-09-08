@@ -19,7 +19,7 @@ const bodyParser = require('body-parser');
 app.use(useragent.express());
 
 app.use(session({
-  secret: '5473ad70a366127adfcf56d678cae123',
+  secret: process.env.SESSION_SECRET || 'development-session-secret',
   resave: false,
   saveUninitialized: true
 }));
@@ -28,9 +28,9 @@ app.use(session({
 passport.use(
   new GoogleStrategy(
     {
-      clientID: "1041228624875-b9hn0jh8pdjv82ssft18j35tipbd0ust.apps.googleusercontent.com",
-      clientSecret: "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",
-      callbackURL: "http://localhost:9292/google/auth/redirect",
+      clientID: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:9292/google/auth/redirect",
     },
     (accessToken, refreshToken, profile, done) => {
       // Aqui você salva/busca o usuário no banco
@@ -92,6 +92,8 @@ app.use(express.urlencoded({ limit: '25mb', extended: true, parameterLimit: 1000
 app.use("/midias", express.static(path.resolve(__dirname, "..", "midias")));
 
 app.use(routes);
+// A loja usa /api como prefixo; manter também as rotas sem prefixo preserva os consumidores atuais.
+app.use("/api", routes);
 
 app.use((req, res, next) => {
   const originalJson = res.json.bind(res);
@@ -107,6 +109,10 @@ app.use((req, res, next) => {
 });
 
 app.use(async (err: Error, req: Request, res: Response, _: NextFunction) => {
+  if (req.path === "/api/asaas/webhook") {
+    console.error("Falha ao interpretar webhook Asaas:", err);
+    return res.status(200).json({received: true});
+  }
   if (err instanceof AppError) {
     return res.status(err?.statusCode).json({ message: err?.message, errors: err?.errors });
   }

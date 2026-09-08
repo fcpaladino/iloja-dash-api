@@ -29,6 +29,13 @@ type ICompanyItem = {
   backgroundIconColor?: string;
   backgroundIconOpacity?: number;
   productCardType?: string;
+  pointsEnabled?: boolean;
+  pointValue?: number;
+  pointCashValue?: number;
+  customerPortalEnabled?: boolean;
+  categoryVisibleCount?: number;
+  recommendedVisibleCount?: number;
+  promotionVisibleCount?: number;
   chavePix?: string;
   isBtnWhatsapp?: boolean;
   isOrder?: boolean;

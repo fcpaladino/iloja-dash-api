@@ -28,6 +28,10 @@ class AnalyticsEvent extends BaseModel<AnalyticsEvent> {
 
   @AllowNull
   @Column
+  deviceId: string;
+
+  @AllowNull
+  @Column
   productId: string;
 
   @AllowNull
@@ -37,6 +41,10 @@ class AnalyticsEvent extends BaseModel<AnalyticsEvent> {
   @AllowNull
   @Column
   categoryName: string;
+
+  @AllowNull
+  @Column
+  categoryId: number;
 
   @AllowNull
   @Column

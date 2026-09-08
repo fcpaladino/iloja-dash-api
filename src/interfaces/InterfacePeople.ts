@@ -17,6 +17,8 @@ type IPeopleItem = {
   complement: string;
   note: string;
   active: boolean;
+  customerPortalAccess?: boolean;
+  walletBalance?: number;
   companyId: number;
 };
 
@@ -38,4 +40,5 @@ type IPeopleListItem = {
   complement: string;
   note: string;
   active: boolean;
+  customerPortalAccess?: boolean;
 }

@@ -9,6 +9,8 @@ route.get("/app/order/lists", isAuth, Controller.lists);
 route.get("/app/order/:id", isAuth, Controller.show);
 route.post("/app/order", isAuth, Controller.store);
 route.put("/app/order/:id", isAuth, Controller.update);
+route.post("/app/order/:id/mark-paid", isAuth, Controller.markPaid);
+route.post("/app/order/:id/installments", isAuth, Controller.installments);
 route.delete("/app/order/:ids", isAuth, Controller.destroy);
 
 export default route;

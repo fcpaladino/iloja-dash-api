@@ -18,6 +18,11 @@ type IProductItem = {
   pricePromotional?: number;
   availability?: boolean;
   point?: number;
+  allowPoints?: boolean;
+  pointsEarn?: number;
+  pointsCost?: number;
+  pointsOnly?: boolean;
+  pointsAndMoney?: boolean;
   isNew?: boolean;
   isPromotional?: boolean;
   isPopular?: boolean;

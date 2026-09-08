@@ -115,6 +115,10 @@ class CompanyController {
       const {id} = req.params;
       const data = req.body as ICompanyItem;
 
+      if (data.schedule !== undefined && data.schedule !== null && typeof data.schedule !== 'string') {
+        data.schedule = JSON.stringify(data.schedule) as any;
+      }
+
       if(data?.email) {
         await ValidateField({
           model: Company,

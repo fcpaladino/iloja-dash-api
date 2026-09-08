@@ -19,10 +19,22 @@ import shippingCep from "./shipping-cep";
 import shippingRule from "./shipping-rule";
 import shippingNeighborhod from "./shipping-neighborhod";
 import apiRoutes from "../API/routes";
+import ai from "./ai";
+import quote from "./quote";
+import feed from "./feed";
+import productStock from "./product-stock";
+import receivable from "./receivable";
+import cash from "./cash";
 
 const routes = Router();
 
 routes.use(apiRoutes);
+routes.use(ai);
+routes.use(quote);
+routes.use(feed);
+routes.use(productStock);
+routes.use(receivable);
+routes.use(cash);
 routes.use(auth);
 routes.use(company);
 routes.use(role);

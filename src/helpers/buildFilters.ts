@@ -23,8 +23,15 @@ export function buildFilters(query: any) {
     if (!val || String(val) === "-1" || String(val) === "all") return;
     if (["pageSize", "page"].includes(key)) return;
 
-    const [field, rawOp] = key.split("__");
-    const operator = rawOp ? `__${rawOp}` : "";
+    const prefixOperators: Record<string, string> = {
+      Contains: "__co", NotContains: "__nco", Equal: "__eq", NotEqual: "__neq",
+      Between: "__be", NotBetween: "__nbe", GreaterThan: "__gt", GreaterThanOrEqual: "__gte",
+      LessThan: "__lt", LessThanOrEqual: "__lte",
+    };
+    const prefix = Object.keys(prefixOperators).find((name) => key.startsWith(name));
+    const normalizedKey = prefix ? key.slice(prefix.length) : key;
+    const [field, rawOp] = normalizedKey.split("__");
+    const operator = prefix ? prefixOperators[prefix] : (rawOp ? `__${rawOp}` : "");
     const op = operatorMap[operator];
     if (!op) return;
 

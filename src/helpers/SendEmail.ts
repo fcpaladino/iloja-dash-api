@@ -2,21 +2,16 @@ const SendEmail = async({...props}) => {
   const nodemailer = require('nodemailer');
 
   const transporter = nodemailer.createTransport({
-    // service: "Gmail",
-    // auth: {
-    //   user: 'smtp.disparo@gmail.com',
-    //   pass: 'gvjblvfpqcckbdmj',
-    // },
     debug: false,
-    host: "45.164.94.15",
-    port: 587,
-    secure: false,
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: String(process.env.SMTP_SECURE || 'false') === 'true',
     logger: false,
     auth: {
-      user: 'cadastro@zapshow.com.br',
-      pass: 'mMl3%8f23',
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
     },
-    tls: {rejectUnauthorized: false},
+    tls: {rejectUnauthorized: process.env.SMTP_REJECT_UNAUTHORIZED !== 'false'},
 
   });
 
