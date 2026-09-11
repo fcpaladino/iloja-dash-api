@@ -45,7 +45,7 @@ class ShippingNeighborhodController {
         page,
         where: where,
         order: order,
-        attributes: ['id', 'name', 'price'],
+        attributes: ['id', 'name', 'city', 'state', 'price'],
       });
 
       return res.json({data: items.items, meta: items.meta});
@@ -62,7 +62,7 @@ class ShippingNeighborhodController {
 
       const items = await ShippingNeighborhod.findAll({
         where: {companyId: user.companyId},
-        attributes: ['id', 'name']
+        attributes: ['id', 'name', 'city', 'state']
       });
 
       return res.json({data: items});
@@ -79,7 +79,7 @@ class ShippingNeighborhodController {
       const {id} = req.params;
 
       const item = await ShippingNeighborhod.findByPk(id, {
-        attributes: ['id', 'name', 'price'],
+        attributes: ['id', 'name', 'city', 'state', 'price'],
       });
 
       return res.json(responseSuccess({

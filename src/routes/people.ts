@@ -6,6 +6,7 @@ const route = express.Router();
 
 route.get("/app/people", isAuth, Controller.index);
 route.get("/app/people/lookup-by-phone/:phone", isAuth, Controller.lookupByPhone);
+route.post("/app/people/:id/manual-balance", isAuth, Controller.manualBalance);
 route.get("/app/people/:id", isAuth, Controller.show);
 route.post("/app/people", isAuth, Controller.store);
 route.put("/app/people/:id", isAuth, Controller.update);

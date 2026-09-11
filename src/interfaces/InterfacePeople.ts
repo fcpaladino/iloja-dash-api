@@ -7,6 +7,7 @@ type IPeopleItem = {
   legalName: string;
   tradeName: string;
   phoneNumber: string;
+  waId?: string;
   email: string;
   zip: string;
   state: string;

@@ -9,6 +9,18 @@ import {Op} from "sequelize";
 import {whereSearch} from "../../database/sequelizeExtension";
 import {buildFilters} from "../../helpers/buildFilters";
 import WalletTransaction from "../../models/WalletTransaction";
+import PointTransaction from "../../models/PointTransaction";
+import {sequelize} from "../../database";
+import AppError from "../../errors/AppError";
+
+const normalizePhoneForStorage = (value: unknown) => String(value || '').replace(/\D/g, '');
+
+const normalizePhoneForSearch = (value: unknown) => {
+  let digits = String(value || '').replace(/\D/g, '');
+  if (digits.startsWith('55')) digits = digits.slice(2);
+  if (digits.length < 10) return digits;
+  return `${digits.slice(0, 2)}${digits.slice(-8)}`;
+};
 
 const validateForm = async (data: IPeopleItem, id: number | null = null) => {
   const schema = yup.object().shape({
@@ -25,6 +37,42 @@ class PeopleController {
     this.update = this.update.bind(this);
     this.destroy = this.destroy.bind(this);
     this.lookupByPhone = this.lookupByPhone.bind(this);
+    this.manualBalance = this.manualBalance.bind(this);
+  }
+
+  @TryCatch()
+  async manualBalance(req: Request, res: Response): Promise<Response> {
+    const user = req.user as IReqUser;
+    const { id } = req.params;
+    const type = String(req.body?.type || '');
+    const amount = Number(req.body?.amount);
+    const reason = String(req.body?.reason || 'Lançamento manual').trim();
+
+    if (!['points', 'credit'].includes(type)) return res.status(422).json({ message: 'Tipo de lançamento inválido.' });
+    if (!Number.isFinite(amount) || amount === 0) return res.status(422).json({ message: 'Informe um valor diferente de zero.' });
+    if (type === 'points' && !Number.isInteger(amount)) return res.status(422).json({ message: 'Pontos devem ser números inteiros.' });
+
+    const result = await sequelize.transaction(async (transaction) => {
+      const item = await People.findOne({ where: { id, companyId: user.companyId }, transaction, lock: transaction.LOCK.UPDATE });
+      if (!item) return null;
+
+      const currentPoints = Number(item.point || 0);
+      const currentWallet = Number(item.walletBalance || 0);
+      const nextPoints = type === 'points' ? currentPoints + amount : currentPoints;
+      const nextWallet = type === 'credit' ? Number((currentWallet + amount).toFixed(2)) : currentWallet;
+      if (nextPoints < 0 || nextWallet < 0) throw new AppError('O saldo não pode ficar negativo.', 422);
+
+      await item.update({ point: nextPoints, walletBalance: nextWallet }, { transaction });
+      if (type === 'points') {
+        await PointTransaction.create({ companyId: user.companyId, peopleId: item.id, type: amount > 0 ? 'MANUAL_CREDIT' : 'MANUAL_DEBIT', points: amount, balanceBefore: currentPoints, balanceAfter: nextPoints, metadata: { source: 'manual', reason } }, { transaction });
+      } else {
+        await WalletTransaction.create({ companyId: user.companyId, peopleId: item.id, type: amount > 0 ? 'CREDIT' : 'ADJUSTMENT', amount, balanceBefore: currentWallet, balanceAfter: nextWallet, metadata: { source: 'manual', reason } }, { transaction });
+      }
+      return { item, point: nextPoints, walletBalance: nextWallet };
+    });
+
+    if (!result) return res.status(404).json({ message: 'Cliente não encontrado.' });
+    return res.json(responseSuccess(result));
   }
 
   @TryCatch()
@@ -117,6 +165,9 @@ class PeopleController {
       // await ValidateField({model: Status, field: 'name', value: data.name.trim(), messageError: 'Nome já em uso.'});
 
       data.companyId = user.companyId;
+      const fullPhone = normalizePhoneForStorage(data.phoneNumber);
+      data.phoneNumber = fullPhone;
+      (data as any).waId = normalizePhoneForSearch(fullPhone);
 
       const item = await People.create(data);
       const address = await PeopleAddress.create({...data, streetId: 1, peopleId: item.id});
@@ -139,6 +190,11 @@ class PeopleController {
     //
     // await ValidateField({model: Status, field: 'name', value: data.name.trim(), id, messageError: 'Nome já em uso.'});
     //
+    if (data.phoneNumber !== undefined) {
+      const fullPhone = normalizePhoneForStorage(data.phoneNumber);
+      data.phoneNumber = fullPhone;
+      (data as any).waId = normalizePhoneForSearch(fullPhone);
+    }
     const item = await People.findByPk(id);
     const address = await PeopleAddress.findOne({
       where:{peopleId: item.id},

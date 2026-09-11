@@ -9,7 +9,7 @@ class ShippingNeighborhoodController {
       const companyId = Number(req.params.companyId);
       const neighborhoods = await ShippingNeighborhod.findAll({
         where: {companyId},
-        attributes: ["id", "name", "price"],
+        attributes: ["id", "name", "city", "state", "price"],
         order: [["name", "ASC"]],
       });
 

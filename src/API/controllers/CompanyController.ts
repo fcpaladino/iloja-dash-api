@@ -30,6 +30,7 @@ class CompanyController {
         pointValue: Number(company.pointValue ?? 1),
         pointCashValue: Number(company.pointCashValue ?? 0.01),
         customerPortalEnabled: company.customerPortalEnabled ?? false,
+        customerPortalApprovalRequired: company.customerPortalApprovalRequired ?? false,
         siteTitle:company.siteTitle,
         siteSubTitle:company.siteSubTitle,
         contactEmail:company.contactEmail,

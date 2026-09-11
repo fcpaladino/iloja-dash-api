@@ -33,6 +33,7 @@ type ICompanyItem = {
   pointValue?: number;
   pointCashValue?: number;
   customerPortalEnabled?: boolean;
+  customerPortalApprovalRequired?: boolean;
   categoryVisibleCount?: number;
   recommendedVisibleCount?: number;
   promotionVisibleCount?: number;

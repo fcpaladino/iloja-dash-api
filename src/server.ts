@@ -1,5 +1,5 @@
-import app from "./app";
 import "./bootstrap";
+import app from "./app";
 import {initSocketIO} from "./utils/socketIO";
 
 const server = app.listen(process.env.PORT, async () => {

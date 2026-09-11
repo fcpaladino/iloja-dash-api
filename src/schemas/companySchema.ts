@@ -53,6 +53,7 @@ export const updateSchema = (id:string|null = null) => {
     pointValue: yup.number().min(0).nullable(),
     pointCashValue: yup.number().min(0).nullable(),
     customerPortalEnabled: yup.boolean().nullable(),
+    customerPortalApprovalRequired: yup.boolean().nullable(),
     recommendedVisibleCount: yup.number().integer().min(1).max(50).nullable(),
     promotionVisibleCount: yup.number().integer().min(1).max(50).nullable(),
   })

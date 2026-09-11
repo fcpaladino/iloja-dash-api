@@ -5,6 +5,7 @@ import { gerarCodigoUnico } from "../../utils/helpers";
 import SendWhatsapp from "../../helpers/SendWhatsapp";
 import Company from "../../models/Company";
 import People from "../../models/People";
+import PeopleAddress from "../../models/PeopleAddress";
 import { createJWT } from "../../utils/jwt";
 
 const localTenants = new Set(["localhost", "127.0.0.1", "::1"]);
@@ -39,11 +40,34 @@ class CustomerAuthController {
   async updateProfile(req: Request, res: Response): Promise<Response> {
     const person = await this.currentPerson(req);
     if (!person) return res.status(403).json({ message: "Acesso ao painel não autorizado." });
-    const name = String(req.body.name || "").trim();
-    if (name.length < 3) return res.status(422).json({ message: "Informe um nome válido." });
-    await person.update({ legalName: name, tradeName: name });
+    const name = req.body.name !== undefined ? String(req.body.name || "").trim() : null;
+    if (name !== null && name.length < 3) return res.status(422).json({ message: "Informe um nome válido." });
+    if (name !== null) await person.update({ legalName: name, tradeName: name });
+
+    if (req.body.address !== undefined) {
+      const input = req.body.address || {};
+      const addressData = {
+        zip: String(input.zip || '').replace(/\D/g, ''),
+        state: String(input.state || '').trim(),
+        city: String(input.city || '').trim(),
+        address: String(input.address || '').trim(),
+        number: String(input.number || '').trim(),
+        district: String(input.district || '').trim(),
+        complement: String(input.complement || '').trim(),
+      };
+      if (addressData.address.length < 3 || addressData.city.length < 2 || addressData.state.length < 2) {
+        return res.status(422).json({ message: "Informe um endereço válido." });
+      }
+      const existingAddress = await PeopleAddress.findOne({ where: { peopleId: person.id }, order: [['id', 'ASC']] });
+      if (existingAddress) await existingAddress.update(addressData);
+      else await PeopleAddress.create({ peopleId: person.id, ...addressData, isPrimary: true });
+    }
+
     const company = await Company.findByPk(person.companyId);
-    return res.json(this.tokenFor(person, company));
+    const address = await PeopleAddress.findOne({ where: { peopleId: person.id }, order: [['id', 'ASC']] });
+    const response: any = this.tokenFor(person, company);
+    response.data.address = address?.toJSON() || null;
+    return res.json(response);
   }
 
   @TryCatch()
@@ -97,7 +121,7 @@ class CustomerAuthController {
         phoneNumber: phone,
         waId: phone,
         active: true,
-        customerPortalAccess: true,
+        customerPortalAccess: !company.customerPortalApprovalRequired,
       } as any);
     } else if (!person.customerPortalAccess) {
       return res.status(403).json({ message: "Este cliente ainda não tem acesso ao painel." });
@@ -120,8 +144,10 @@ class CustomerAuthController {
     const code = String(req.body.code || "").trim();
     const company = await companyFromRequest(req);
     if (!company?.active || !company.customerPortalEnabled) return res.status(404).json({ message: "Painel do cliente indisponível." });
-    const person = await People.findOne({ where: { companyId: company.id, active: true, customerPortalAccess: true, phoneCode: code, phoneCodeExpiresAt: { [Op.gt]: new Date() }, ...phoneWhere(phone) } });
+    const person = await People.findOne({ where: { companyId: company.id, active: true, phoneCode: code, phoneCodeExpiresAt: { [Op.gt]: new Date() }, ...phoneWhere(phone) } });
     if (!person) return res.status(401).json({ message: "Código inválido ou expirado." });
+
+    if (!person.customerPortalAccess) return res.status(403).json({ code: 'PORTAL_PENDING_APPROVAL', message: "Sua conta está pendente de aprovação." });
 
     await person.update({ phoneCode: null, phoneCodeExpiresAt: null });
     return res.json(this.tokenFor(person, company));

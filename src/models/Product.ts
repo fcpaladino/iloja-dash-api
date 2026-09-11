@@ -108,7 +108,7 @@ class Product extends BaseModel<Product> {
   active: boolean;
 
   @AllowNull(false)
-  @Column
+  @Column({defaultValue: true})
   includeInMetaFeed: boolean;
 
   @AllowNull

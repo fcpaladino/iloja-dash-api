@@ -28,6 +28,14 @@ class ShippingNeighborhod extends BaseModel<ShippingNeighborhod> {
 
   @AllowNull
   @Column
+  city: string;
+
+  @AllowNull
+  @Column
+  state: string;
+
+  @AllowNull
+  @Column
   slug: string;
 
   @AllowNull
