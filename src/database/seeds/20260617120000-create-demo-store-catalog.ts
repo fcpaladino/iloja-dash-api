@@ -367,7 +367,12 @@ module.exports = {
 
       const existingProduct = await queryInterface.rawSelect(
         "Product",
-        { where: { companyId, ref: "S25-256" }, transaction },
+        {
+          // Os IDs deste catálogo são reservados. A verificação por ID também
+          // cobre uma execução interrompida antes do companyId/ref serem gravados.
+          where: { id: remapId(products[0].id) },
+          transaction
+        },
         ["id"]
       );
 
