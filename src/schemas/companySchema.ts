@@ -14,6 +14,7 @@ export const storeSchema = () => {
     phone: yup.string(),
     active: yup.boolean(),
     subdomain: yup.string(),
+    productActionMode: yup.string().oneOf(['checkout', 'interest']),
   })
 }
 
@@ -24,6 +25,7 @@ export const updateSchema = (id:string|null = null) => {
     phone: yup.string(),
     active: yup.boolean(),
     subdomain: yup.string(),
+    productActionMode: yup.string().oneOf(['checkout', 'interest']),
     schedule: yup.mixed().nullable(),
 
     contactWhatsapp: yup.string().nullable(),
@@ -48,6 +50,8 @@ export const updateSchema = (id:string|null = null) => {
       'detailed',
       'grid',
     ]).nullable(),
+    productCardTypeMobile: yup.string().nullable(),
+    productCardTypeDesktop: yup.string().nullable(),
     categoryVisibleCount: yup.number().integer().min(1).max(50).nullable(),
     pointsEnabled: yup.boolean().nullable(),
     pointValue: yup.number().min(0).nullable(),

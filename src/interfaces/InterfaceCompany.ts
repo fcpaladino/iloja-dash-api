@@ -29,6 +29,9 @@ type ICompanyItem = {
   backgroundIconColor?: string;
   backgroundIconOpacity?: number;
   productCardType?: string;
+  productCardTypeMobile?: string;
+  productCardTypeDesktop?: string;
+  productActionMode?: 'checkout' | 'interest';
   pointsEnabled?: boolean;
   pointValue?: number;
   pointCashValue?: number;

@@ -20,6 +20,7 @@ import SubscriptionProduct from "../models/SubscriptionProduct";
 import SubscriptionHistoric from "../models/SubscriptionHistoric";
 import Brand from "../models/Brand";
 import Product from "../models/Product";
+import ProductField from "../models/ProductField";
 import Coupon from "../models/Coupon";
 import DeliveryType from "../models/DeliveryType";
 import Filter from "../models/Filter";
@@ -47,6 +48,8 @@ import ReceivableInstallment from "../models/ReceivableInstallment";
 import CashMovement from "../models/CashMovement";
 import PointTransaction from "../models/PointTransaction";
 import WalletTransaction from "../models/WalletTransaction";
+import UserCompany from "../models/UserCompany";
+import ProductInterestLead from "../models/ProductInterestLead";
 
 
 const dbConfig = require("../config/database");
@@ -74,6 +77,7 @@ sequelize.addModels([
   SubscriptionProduct,
   SubscriptionHistoric,
   Product,
+  ProductField,
   Coupon,
   DeliveryType,
   Filter,
@@ -101,6 +105,8 @@ sequelize.addModels([
   ,CashMovement
   ,PointTransaction
   ,WalletTransaction
+  ,UserCompany
+  ,ProductInterestLead
 ]);
 
 AddOverrideQuery();

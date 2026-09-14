@@ -14,6 +14,7 @@ import Product from "../../models/Product";
 import {remove, rename} from "../../utils/file";
 import { File as MulterFile } from 'multer';
 import DeliveryType from "../../models/DeliveryType";
+import UserCompany from "../../models/UserCompany";
 
 class CompanyController {
   constructor() {
@@ -74,8 +75,10 @@ class CompanyController {
       const user = req.user as IReqUser;
       const data = req.body as ICompanyItem;
 
-      await ValidateField({model: User, field: 'email', value: data.email.trim(), messageError: 'E-mail já em uso.'});
-      await ValidateField({model: Company, field: 'email', value: data.email.trim(), messageError: 'E-mail já em uso.'});
+      const existingUser = await User.findOne({ where: { email: data.email.trim().toLowerCase() } });
+      if (!existingUser) {
+        await ValidateField({model: User, field: 'email', value: data.email.trim(), messageError: 'E-mail já em uso.'});
+      }
 
       // const plan = await Plan.create({name: `Plan: ${data.name}`});
       // data.planId = plan.id;
@@ -88,16 +91,27 @@ class CompanyController {
         companyId: item.id,
       });
 
-      const userCompany = await User.create({
-        name: item.name,
-        email: item.email,
-        username: createUsernameByEmail(item.email),
+      let userCompany = existingUser;
+      if (!userCompany) {
+        userCompany = await User.create({
+          name: item.name,
+          email: item.email,
+          username: createUsernameByEmail(item.email),
+          companyId: item.id,
+          roleId: roleCompany.id,
+          emailVerifiedAt: new Date(),
+          password: data.password || 'secret@!!',
+          owner: true,
+          active: true
+        });
+      }
+
+      await UserCompany.create({
+        userId: userCompany.id,
         companyId: item.id,
         roleId: roleCompany.id,
-        emailVerifiedAt: new Date(),
-        password: data.password || 'secret@!!',
         owner: true,
-        active: true
+        active: true,
       });
 
 

@@ -6,7 +6,7 @@ import {
   Model,
   PrimaryKey,
   AutoIncrement,
-  AllowNull, DeletedAt,
+  AllowNull, DeletedAt, DataType,
 } from "sequelize-typescript";
 import {BaseModel} from "../database/baseModelSequelize";
 
@@ -64,6 +64,10 @@ class Product extends BaseModel<Product> {
   @AllowNull
   @Column
   text: string;
+
+  @AllowNull(false)
+  @Column(DataType.JSONB)
+  customFields: Record<string, any>;
 
   @AllowNull
   @Column

@@ -10,6 +10,7 @@ import {remove, rename} from "../../utils/file";
 import ValidateField from "../../services/ValidateField";
 import { TryCatch } from '../../helpers/TryCatch';
 import {Op} from "sequelize";
+import UserCompany from "../../models/UserCompany";
 
 const validateForm = async (data: IUserItem, id: number | null = null) => {
   const schema = yup.object().shape({
@@ -45,7 +46,7 @@ class UserController {
       // orderBy?.map(item => [String(item.name), String(item.order)])
 
       const conditions = [
-        whereSearch('companyId', '=', user.companyId),
+        whereSearch('id', 'in', (await UserCompany.findAll({ where: { companyId: user.companyId, active: true }, attributes: ['userId'], raw: true })).map((item: any) => item.userId)),
         whereSearch('roleId', '=', role),
         whereSearch('active', 'bool', status),
         whereSearch('name', 'like', search),
@@ -103,6 +104,7 @@ class UserController {
       data.companyId = user.companyId;
 
       const item = await User.create(data);
+      await UserCompany.create({ userId: item.id, companyId: user.companyId, roleId: data.roleId, owner: false, active: data.active !== false });
 
       return res.json(responseSuccess({item}));
 

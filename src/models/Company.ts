@@ -150,6 +150,18 @@ class Company extends BaseModel<Company> {
   @Column({defaultValue: "right_square"})
   productCardType: string;
 
+  @AllowNull
+  @Column({ defaultValue: 'grid' })
+  productCardTypeMobile: string;
+
+  @AllowNull
+  @Column({ defaultValue: 'right_square' })
+  productCardTypeDesktop: string;
+
+  @AllowNull(false)
+  @Column({ defaultValue: 'checkout' })
+  productActionMode: 'checkout' | 'interest';
+
   @AllowNull(false) @Column({defaultValue: false}) pointsEnabled: boolean;
   @AllowNull(false) @Column({defaultValue: 1}) pointValue: number;
   @AllowNull(false) @Column({defaultValue: 0.01}) pointCashValue: number;

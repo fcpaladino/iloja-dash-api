@@ -5,6 +5,7 @@ import PasswordReset from "../controllers/Auth/PasswordResetController";
 import TwoFa from "../controllers/Auth/TwoFaController";
 import isAuth from "../middleware/isAuth";
 import CustomerAuth from "../controllers/Auth/CustomerAuthController";
+import CompanySwitch from "../controllers/Auth/CompanySwitchController";
 
 const route = express.Router();
 
@@ -16,6 +17,7 @@ route.post("/auth/whatsapp/change-request", isAuth, CustomerAuth.requestPhoneCha
 route.post("/auth/whatsapp/change-verify", isAuth, CustomerAuth.confirmPhoneChange);
 
 route.post("/auth/refresh-token", Login.refresh);
+route.post("/auth/switch-company", isAuth, CompanySwitch.store);
 
 route.get("/auth/2fa/generate", isAuth, TwoFa.generate);
 route.post("/auth/2fa/validate", isAuth, TwoFa.validate);

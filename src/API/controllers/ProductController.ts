@@ -6,6 +6,7 @@ import {IQueryFilter} from "../interfaces/queryFilter";
 import Product from "../../models/Product";
 import {whereSearch} from "../../database/sequelizeExtension";
 import {Op} from "sequelize";
+import ProductField from "../../models/ProductField";
 
 class ProductController {
   constructor() {
@@ -28,6 +29,17 @@ class ProductController {
         }
         : null;
 
+      const rawCustomFields = (req.query as any).customFields;
+      const customFieldQuery = rawCustomFields && typeof rawCustomFields === 'object' ? rawCustomFields : {};
+      const filterFields = Object.keys(customFieldQuery).length
+        ? await ProductField.findAll({ where: { companyId, active: true, isFilter: true }, attributes: ['slug'] })
+        : [];
+      const customConditions = filterFields.flatMap((field) => {
+        const value = customFieldQuery[field.slug];
+        if (value === undefined || value === '' || value === 'all') return [];
+        return [{ customFields: { [Op.contains]: { [field.slug]: Array.isArray(value) ? value : String(value) } } }];
+      });
+
       const conditions = [
         whereSearch('companyId', '=', companyId),
         whereSearch('active', 'bool', true),
@@ -35,7 +47,8 @@ class ProductController {
         whereSearch('brandId', '=', brandId),
         whereSearch('groupId', '=', groupId),
         whereSearch('subGroupId', '=', subgroupId),
-        searchCond
+        searchCond,
+        ...customConditions
       ].filter(Boolean);
       const where = conditions.length > 0 ? { [Op.and]: conditions } : {};
 

@@ -10,6 +10,8 @@ type IUserToken = {
   is2fa: boolean;
   isMaster: boolean;
   owner: boolean;
+  roleId?: number;
+  companies?: Array<{id: number; name: string; roleId: number; owner: boolean}>;
   version: number;
 };
 

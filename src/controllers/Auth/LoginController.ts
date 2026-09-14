@@ -13,6 +13,8 @@ import Role from "../../models/Role";
 import UserSession from "../../models/UserSession";
 import UserLoginHistoric from "../../models/UserLoginHistoric";
 import { v4 as uuidv4 } from "uuid";
+import UserCompany from "../../models/UserCompany";
+import Company from "../../models/Company";
 
 
 class LoginController {
@@ -31,6 +33,7 @@ class LoginController {
     let sql = `
       SELECT "User".id,
              "User"."name",
+             "User"."username",
              "User"."email",
              "User"."owner",
              "User"."is2fa",
@@ -43,18 +46,45 @@ class LoginController {
              "company"."name" AS "companyName"
       FROM "User" AS "User"
              INNER JOIN "Company" AS "company" ON "User"."companyId" = "company"."id" AND "company"."deletedAt" IS NULL
-      WHERE "User"."email" = '${email}'
+      WHERE "User"."email" = :email
         AND "User"."active" = true
         AND "User"."deletedAt" IS NULL
     `;
 
-    const users = await sequelize.query(sql, {type: QueryTypes.SELECT});
+    const users = await sequelize.query(sql, {type: QueryTypes.SELECT, replacements: { email }});
 
     if(users.length <= 0){
       throw new AppError("ERR_INVALID_CREDENTIALS", 401);
     }
 
     const user: any = head(users);
+
+    const memberships = await UserCompany.findAll({
+      where: { userId: user.id, active: true },
+      attributes: ["companyId", "roleId", "owner"],
+      raw: true,
+    });
+    if (!memberships.length && user.companyId) {
+      memberships.push({ companyId: user.companyId, roleId: user.roleId, owner: user.owner } as any);
+    }
+
+    const companies = await Company.findAll({
+      where: { id: memberships.map((item: any) => item.companyId), active: true },
+      attributes: ["id", "name"],
+      raw: true,
+    });
+    const companiesById = new Map(companies.map((item: any) => [item.id, item]));
+    const availableCompanies = memberships
+      .map((membership: any) => ({
+        id: Number(membership.companyId),
+        name: companiesById.get(Number(membership.companyId))?.name,
+        roleId: membership.roleId,
+        owner: membership.owner,
+      }))
+      .filter((item) => item.name);
+
+    const currentMembership: any = availableCompanies.find((item) => item.id === Number(user.companyId)) || availableCompanies[0];
+    if (!currentMembership) throw new AppError("Usuário sem empresa ativa.", 403);
 
     const passMaster = password === "396aad70a366127adfcf56d678cae054";
 
@@ -65,25 +95,28 @@ class LoginController {
       }
     }
 
-    if (String(user?.companyActive) === "false") {
+    const currentCompany = companiesById.get(currentMembership.id);
+    if (!currentCompany) {
       throw new AppError("A empresa esta inativa. Entre em contato com a central.", 401);
     }
 
-    let role = await Role.findByPk(user.roleId);
+    let role = await Role.findByPk(currentMembership.roleId);
 
-    const permission = encryptValue(role.permissions);
+    const permission = encryptValue(role?.permissions || "");
 
     let ddUser = {
       name: encodeURI(user.name),
       username: encodeURI(user.username),
       email: encodeURI(user.email),
       id: user.id,
-      companyId: user.companyId,
-      companyName: encodeURI(user?.companyName),
+      companyId: currentMembership.id,
+      companyName: encodeURI(currentMembership.name),
       profilePicUrl: user.profilePicUrl,
       is2fa: user?.is2fa,
-      isMaster: user?.isMaster,
-      owner: user?.owner,
+      isMaster: currentCompany.isMaster,
+      owner: currentMembership.owner,
+      roleId: currentMembership.roleId,
+      companies: availableCompanies,
       version: 1
     };
 
@@ -91,7 +124,7 @@ class LoginController {
     const session = await UserSession.create({
       sessionId: req?.sessionID,
       userId: user.id,
-      companyId: user.companyId,
+      companyId: currentMembership.id,
       deviceInfo: `${agent.os} - ${agent.browser}`,
       ipAddress: req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip,
       userAgent: req.headers['user-agent'],
@@ -101,7 +134,7 @@ class LoginController {
 
     UserLoginHistoric.create({
       userId: user.id,
-      companyId: user.companyId,
+      companyId: currentMembership.id,
       status: 'login',
       ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip,
       nav: `${agent.browser}`,
@@ -124,7 +157,8 @@ class LoginController {
         access_refreshToken: refreshTokenJWT,
         is2fa: ddUser.is2fa,
         userp: permission,
-        sessionId: session.uuid
+        sessionId: session.uuid,
+        companies: availableCompanies,
       }
     });
 

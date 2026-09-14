@@ -9,6 +9,7 @@ import Group from "../../models/Group";
 import SubGroup from "../../models/SubGroup";
 import Filter from "../../models/Filter";
 import FilterItem from "../../models/FilterItem";
+import ProductField from "../../models/ProductField";
 
 class FilterController {
   constructor() {
@@ -76,13 +77,20 @@ class FilterController {
         ]
       })
 
+      const productFields = await ProductField.findAll({
+        where: { companyId, active: true, isFilter: true },
+        attributes: ['id', 'name', 'slug', 'type', 'options', 'isFilter'],
+        order: [["order", "ASC"], ["name", "ASC"]],
+      });
+
 
 
       const items = [{
         categories,
         brands,
         groups,
-        filters
+        filters,
+        productFields,
       }];
 
       return responseSuccess(res, items);
