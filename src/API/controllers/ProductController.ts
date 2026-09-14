@@ -4,7 +4,6 @@ import responseSuccess from "../responses/responseList";
 import {IReqParams} from "../interfaces/reqParams";
 import {IQueryFilter} from "../interfaces/queryFilter";
 import Product from "../../models/Product";
-import ProductImage from "../../models/ProductImage";
 import {whereSearch} from "../../database/sequelizeExtension";
 import {Op} from "sequelize";
 import ProductField from "../../models/ProductField";
@@ -75,11 +74,6 @@ class ProductController {
         where: {companyId, id}
       });
 
-      const images = await ProductImage.findAll({
-        where: { companyId, productId: id, isDefault: false, active: true },
-        order: [['order', 'ASC'], ['id', 'ASC']],
-      });
-
       // const tag = await Tag.findOne({
       //   where:{companyId, id}
       // });
@@ -89,14 +83,7 @@ class ProductController {
       // const normalize = tagShowNormalize(tag.dataValues);
       // const result = sanitizeType<ITag>([normalize], ITagShow);
       //
-      return responseSuccess(res, [{
-        ...item.dataValues,
-        image: item.image,
-        images: images.map((image) => ({
-          ...image.dataValues,
-          url: image.url?.includes('://') ? image.url : `${process.env.BACKEND_URL}/${image.url}`,
-        })),
-      }]);
+      return responseSuccess(res, [item]);
 
     } catch (e){
       return HandlerError(res, e, 'Api.Product.show');
