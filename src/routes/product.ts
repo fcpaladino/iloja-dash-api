@@ -16,6 +16,7 @@ route.put("/app/product/:id", isAuth, Controller.update);
 route.delete("/app/product/:ids", isAuth, Controller.destroy);
 
 route.post("/app/product/image/:productId", isAuth, upload.single("file"), Controller.uploadImage);
+route.delete("/app/product/image/:productId/:imageId", isAuth, Controller.destroyGalleryImage);
 route.delete("/app/product/image/:productId", isAuth, Controller.destroyImage);
 
 export default route;

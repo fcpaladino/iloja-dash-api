@@ -30,6 +30,7 @@ class ProductController {
     this.lists = this.lists.bind(this);
     this.uploadImage = this.uploadImage.bind(this);
     this.destroyImage = this.destroyImage.bind(this);
+    this.destroyGalleryImage = this.destroyGalleryImage.bind(this);
   }
 
   @TryCatch()
@@ -84,10 +85,20 @@ class ProductController {
       const user = req.user as IReqUser;
       const {id} = req.params;
 
-      const item = await Product.findByPk(id);
+      const item = await Product.findOne({ where: { id, companyId: user.companyId } });
+
+      const images = await ProductImage.findAll({
+        where: { productId: id, companyId: user.companyId, isDefault: false, active: true },
+        order: [['order', 'ASC'], ['id', 'ASC']],
+      });
 
       return res.json(responseSuccess({
-        ...item.dataValues, image: item.image? `${item.image}` : null
+        ...item.dataValues,
+        image: item.image? `${item.image}` : null,
+        images: images.map((image) => ({
+          ...image.dataValues,
+          url: image.url?.includes('://') ? image.url : `${process.env.BACKEND_URL}/${image.url}`,
+        })),
       }));
 
     } catch (e) {
@@ -167,17 +178,28 @@ class ProductController {
       logDevJson(file)
       logDevJson(data)
 
-      const product = await Product.findByPk(productId, {attributes: ['id', 'image']});
+      const product = await Product.findByPk(productId, {attributes: ['id', 'image', 'companyId']});
+
+      if (!product || product.companyId !== userReq.companyId) return res.status(404).end();
 
       const [,ext] = file.originalname.split('.');
-      const filename = `${gerarHashEmail(`${product.id}`)}.${ext}`;
+      const filename = `${gerarHashEmail(`${product.id}`)}.${(ext || 'jpg').toLowerCase()}`;
+
+      const isDefault = String(data.isDefault) !== 'false';
+
+      if (isDefault && product.getDataValue('image')) {
+        await remove({caminho: product.getDataValue('image')});
+        await ProductImage.destroy({where: {productId, companyId: userReq.companyId, isDefault: true}, force: true});
+      }
 
       await rename({caminhoAtual: file.path, novoNome: filename });
 
       const url = `midias/company${userReq.companyId}/product/${filename}`;
 
-      product.image = url;
-      await product.save();
+      if (isDefault) {
+        product.image = url;
+        await product.save();
+      }
 
       await ProductImage.create({
         companyId: userReq.companyId,
@@ -188,8 +210,9 @@ class ProductController {
         mimetype: file.mimetype,
         width: data.width,
         height: data.height,
-        isDefault: true,
+        isDefault,
         active: true,
+        order: isDefault ? 0 : (await ProductImage.count({where: {productId, companyId: userReq.companyId, isDefault: false}}) + 1),
       });
 
       return res.end();
@@ -203,7 +226,10 @@ class ProductController {
     try {
       const {productId} = req.params;
 
-      const product = await Product.findByPk(productId, {attributes: ['id', 'image']});
+      const userReq = req.user as IReqUser;
+      const product = await Product.findOne({where: {id: productId, companyId: userReq.companyId}, attributes: ['id', 'image']});
+
+      if (!product) return res.status(404).end();
 
       await remove({caminho: product.image});
 
@@ -216,6 +242,19 @@ class ProductController {
     } catch (e) {
       return HandlerError(e, res);
     }
+  }
+
+  @TryCatch()
+  async destroyGalleryImage (req: Request, res: Response): Promise<Response> {
+    const userReq = req.user as IReqUser;
+    const {productId, imageId} = req.params;
+    const image = await ProductImage.findOne({where: {id: imageId, productId, companyId: userReq.companyId, isDefault: false}});
+
+    if (!image) return res.status(404).end();
+
+    await remove({caminho: image.url});
+    await image.destroy({force: true});
+    return res.end();
   }
 }
 

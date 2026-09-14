@@ -9,6 +9,7 @@ import {whereSearch} from "../../database/sequelizeExtension";
 import {buildFilters} from "../../helpers/buildFilters";
 import Group from "../../models/Group";
 import {slugify} from "../../helpers/slugify";
+import ValidateField from "../../services/ValidateField";
 
 const validateForm = async (data: ICategoryItem, id: number | null = null) => {
   const schema = yup.object().shape({
