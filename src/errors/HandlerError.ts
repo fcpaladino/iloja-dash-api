@@ -30,9 +30,10 @@ export const HandlerError = (err, res)=> {
   }
 
   if(err instanceof AppError) {
-    if(err?.statusCode === 400){
-      return res.status(400).json({ errors: err?.errors });
-    }
+    return res.status(err.statusCode).json({ message: err.message, errors: err.errors });
+  }
+  if (err?.code === 'LIMIT_FILE_SIZE' || err?.code === 'LIMIT_FILE_COUNT' || err?.code === 'LIMIT_UNEXPECTED_FILE') {
+    return res.status(400).json({ message: 'Envie até 4 imagens JPEG, PNG ou WEBP de no máximo 5 MB cada.' });
   }
 
   return res.status(500).json({ error: 'Erro interno do servidor' });

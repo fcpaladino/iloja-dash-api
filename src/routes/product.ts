@@ -4,9 +4,12 @@ import Controller from "../controllers/App/ProductController";
 import isAuth from "../middleware/isAuth";
 
 import uploadConfig from "../config/uploadProduct";
+import {analyzeProductImages, productAIUpload} from "../controllers/App/ProductAIController";
 const upload = multer(uploadConfig);
 
 const route = express.Router();
+
+route.post("/products/ai/analyze", isAuth, productAIUpload.array("images", 4), analyzeProductImages);
 
 route.get("/app/product", isAuth, Controller.index);
 route.get("/app/product/lists", isAuth, Controller.lists);

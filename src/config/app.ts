@@ -9,6 +9,7 @@ export default {
   iaServiceUrl: process.env.IA_SERVICE_DIRECT_URL || process.env.IA_SERVICE_URL,
   iaServiceApiKey: process.env.IA_SERVICE_API_TOKEN || process.env.IA_SERVICE_API_KEY,
   iaServiceTimeoutMs: Number(process.env.IA_SERVICE_TIMEOUT_MS || 30000),
+  aiProvider: process.env.AI_PROVIDER || "openai",
   asaasApiUrl: process.env.ASAAS_API_URL || 'https://api.asaas.com/v3',
   asaasApiKey: process.env.ASAAS_API_KEY_PROD || process.env.ASAAS_API_KEY,
   asaasWebhookToken: process.env.ASAAS_WEBHOOK_TOKEN,
